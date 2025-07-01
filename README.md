@@ -1,6 +1,210 @@
 # RecoilStore
 
 ..........................................................................................................
+
+7.4 => Advance Concept
+
+---
+
+## 🧠 What is Recoil?
+
+Recoil is a state management library for React by Facebook. It provides shared state using atoms and selectors, making it easier to manage global state in large apps.
+
+---
+
+## 🔹 `atom`: The Source of Truth
+
+### ✅ Definition
+
+An **atom** is a unit of state. It represents a single piece of state — like a variable — that can be read or written from multiple components.
+
+### ✅ Syntax
+
+```js
+import { atom } from 'recoil';
+
+export const networkAtom = atom({
+  key: 'networkAtom',   // unique ID (required)
+  default: 0,           // initial/default value
+});
+```
+
+---
+
+## 🔹 `selector`: Derived State (Like useMemo)
+
+### ✅ Definition
+
+A **selector** is used to derive data from atoms or other selectors. It's like `useMemo`, but managed globally.
+
+### ✅ Syntax
+
+```js
+import { selector } from 'recoil';
+
+export const totalNotificationSelector = selector({
+  key: 'totalNotificationSelector',
+  get: ({ get }) => {
+    const net = get(networkAtom);
+    const job = get(jobsAtom);
+    const msg = get(messagingAtom);
+    const notif = get(notificationAtom);
+    return net + job + msg + notif;
+  },
+});
+```
+
+> It recalculates only when one of its dependencies changes — very efficient.
+
+---
+
+## 🔹 `useRecoilValue`: Read-Only Access
+
+### ✅ Usage
+
+```js
+const value = useRecoilValue(networkAtom);
+```
+
+* Reads the current value of an atom/selector
+* Cannot modify it
+
+---
+
+## 🔹 `useRecoilState`: Read + Write (like useState)
+
+### ✅ Usage
+
+```js
+const [value, setValue] = useRecoilState(messagingAtom);
+```
+
+* Reads and updates the atom
+* Two-way binding
+
+---
+
+## 🔹 `useSetRecoilState`: Write-Only Setter
+
+### ✅ Usage
+
+```js
+const setCount = useSetRecoilState(messagingAtom);
+```
+
+* Sets/updates atom value without reading it
+
+---
+
+## 🔧 Example Explanation (from your code)
+
+```js
+import {
+  useRecoilValue,
+  useRecoilState,
+  useSetRecoilState,
+  RecoilRoot
+} from 'recoil';
+import {
+  jobsAtom,
+  messagingAtom,
+  networkAtom,
+  notificationAtom
+} from './atoms';
+```
+
+You wrap the app with `<RecoilRoot>` to enable Recoil globally.
+
+---
+
+### 🔸 `MainApp` (Basic Atom Usage)
+
+```js
+function MainApp() {
+  const networkNotificationCount = useRecoilValue(networkAtom);
+  const jobsAtomCount = useRecoilValue(jobsAtom);
+  const notificationAtomCount = useRecoilValue(notificationAtom);
+  const messagingAtomCount = useRecoilValue(messagingAtom);
+```
+
+You are displaying values using atoms, like:
+
+```jsx
+<button>Jobs ({jobsAtomCount})</button>
+```
+
+---
+
+### 🔸 `ButtonUpdater` (Use of useSetRecoilState)
+
+```js
+function ButtonUpdater(){
+  const setMessagingAtomCount = useSetRecoilState(messagingAtom);
+  return (
+    <button onClick={() => {
+      setMessagingAtomCount(c => c + 1);
+    }}>
+      Me
+    </button>
+  );
+}
+```
+
+This function increments the value of `messagingAtom` using the setter only.
+
+---
+
+## 🧠 SELECTOR VERSION (Derived Total Count)
+
+```js
+const totalNotificationCount = useRecoilValue(totalNotificationSelector);
+```
+
+This replaces the manual `useMemo()` way:
+
+```js
+const total = useMemo(() => jobs + notif + msg + net, [..])
+```
+
+It’s more scalable and reactive when using selectors.
+
+---
+
+## 💡 Why Use Selectors?
+
+| Without Selector                     | With Selector                     |
+| ------------------------------------ | --------------------------------- |
+| Manual computation using `useMemo()` | Automatically tracks dependencies |
+| Can’t be shared across components    | Reusable across the app           |
+| Not global                           | Global derived state              |
+
+---
+
+## ✅ Final Summary
+
+| Hook                      | Purpose                                       |
+| ------------------------- | --------------------------------------------- |
+| `atom`                    | Stores a single piece of state                |
+| `selector`                | Calculates derived state from atoms/selectors |
+| `useRecoilValue(atom)`    | Read-only access to state                     |
+| `useRecoilState(atom)`    | Read/write access (like useState)             |
+| `useSetRecoilState(atom)` | Write-only access (used in handlers)          |
+
+---
+
+## ✅ Example Use Case Recap
+
+Your app simulates a **LinkedIn-style notification system**:
+
+* Each button shows a count from an atom
+* One derived count shows **total notifications** using a selector
+* You update notifications (like "Me" button) via a `useSetRecoilState`
+
+---
+
+
+
+.....................................................
 # Asynchronous Data Queries 
 .............................
 
