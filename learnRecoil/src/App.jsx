@@ -101,7 +101,7 @@ function App(){
 
 function MainApp() {
 
-   const [networkCount, setNetworkCount] = useRecoilState(notifications)
+  const [networkCount, setNetworkCount] = useRecoilState(notifications)
   const totalNotificationCount = useRecoilValue(totalNotificationSelector); 
 
   // useEffect(()=>{

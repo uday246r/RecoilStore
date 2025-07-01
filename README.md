@@ -125,5 +125,8 @@ export default function App() {
 * Use `useRecoilValueLoadable()` to handle `loading`, `hasValue`, `hasError` states easily.
 * Avoids initial `default` flicker and unnecessary `useEffect()` in components.
 
+## Self Summary 
+
+As we use useEffect to fetch async data using,fetch axios, but when try to do the same here also first the default value from the atom will render just form small milliseconds, and then suddenly the fetched data. So, to overcome this we define this async function inside default value of atom but the default can not have async function so that why we use selector which provide us get method which can be async fucntion
 
 ..........................................................................................................
